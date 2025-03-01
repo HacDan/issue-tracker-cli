@@ -1,6 +1,5 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -9,8 +8,6 @@ import (
 
 	"github.com/spf13/cobra"
 )
-
-
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -45,7 +42,19 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	var title string
+	rootCmd.PersistentFlags().StringVarP(&title, "title", "t", "", "Title for issue")
+
+	var description string
+	rootCmd.PersistentFlags().StringVarP(&description, "description", "d", "", "Description for issue")
+
+	var priority string
+	rootCmd.PersistentFlags().StringVarP(&priority, "priority", "p", "low", "Priority for issue")
+
+	var status string
+	rootCmd.PersistentFlags().StringVarP(&status, "status", "s", "open", "Status for issue")
+
+	var user string
+	rootCmd.PersistentFlags().StringVarP(&user, "user", "a", "", "User assigned to issue")
 }
-
-

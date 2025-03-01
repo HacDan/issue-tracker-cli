@@ -29,7 +29,7 @@ func NewStorage() Storage {
 }
 
 func CreateDB(db *sql.DB) {
-	createIssueTableStatement, err  := db.Prepare("CREATE TABLE IF NOT EXISTS issues(id INTEGER, title TEXT, description TEXT, status INTEGER, user TEXT);")
+	createIssueTableStatement, err := db.Prepare("CREATE TABLE IF NOT EXISTS issues(id INTEGER, title TEXT, description TEXT, status INTEGER, user TEXT);")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -95,14 +95,13 @@ func (s *Storage) GetIssueByStatus(status string) ([]types.Issue, error) {
 			return issues, err
 		}
 		issues = append(issues, *issue)
-		return issues, nil
 	}
 	return issues, errors.New("No issues found with that status")
 }
 
 func (s *Storage) GetIssueByUser(user string) ([]types.Issue, error) {
 	issues := []types.Issue{}
-	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE user = `?`")
+	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE user LIKE ?")
 	if err != nil {
 		return issues, err
 	}
@@ -119,7 +118,6 @@ func (s *Storage) GetIssueByUser(user string) ([]types.Issue, error) {
 			return issues, err
 		}
 		issues = append(issues, *issue)
-		return issues, nil
 	}
 	return issues, errors.New("No issues found for that user")
 }
@@ -166,7 +164,6 @@ func (s Storage) GetIssues() ([]types.Issue, error) {
 			return issues, err
 		}
 		issues = append(issues, *issue)
-		return issues, nil
 	}
 
 	return issues, errors.New("No issues found")

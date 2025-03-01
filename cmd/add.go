@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -51,20 +48,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	var title string
-	addCmd.Flags().StringVarP(&title, "title", "t", "", "Title for issue")
-
-	var description string
-	addCmd.Flags().StringVarP(&description, "description", "d", "", "Description for issue")
-
-	var priority string
-	addCmd.Flags().StringVarP(&priority, "priority", "p", "low", "Priority for issue")
-
-	var status string
-	addCmd.Flags().StringVarP(&status, "status", "s", "open", "Status for issue")
-
-	var user string
-	addCmd.Flags().StringVarP(&user, "user", "a", "", "User assigned to issue")
 }
 
 func setStatus(s string) types.IssueStatus {
