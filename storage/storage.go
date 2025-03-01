@@ -3,6 +3,7 @@ package storage
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
 	"math"
 
@@ -20,8 +21,21 @@ func NewStorage() Storage {
 		log.Fatal(err)
 	}
 
+	CreateDB(db)
+
 	return Storage{
 		store: db,
+	}
+}
+
+func CreateDB(db *sql.DB) {
+	createIssueTableStatement, err  := db.Prepare("CREATE TABLE IF NOT EXISTS issues(id INTEGER, title TEXT, description TEXT, status INTEGER, user TEXT);")
+	if err != nil {
+		fmt.Println(err)
+	}
+	_, err = createIssueTableStatement.Exec()
+	if err != nil {
+		fmt.Println(err)
 	}
 }
 
@@ -211,5 +225,4 @@ func (s *Storage) getNextID() int {
 		}
 	}
 	return max + 1
-
 }
