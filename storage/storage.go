@@ -2,10 +2,12 @@ package storage
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"math"
 
 	"github.com/hacdan/issue-tracker-cli/types"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Storage struct {
@@ -25,7 +27,161 @@ func NewStorage() Storage {
 
 func (s *Storage) AddIssue(issue types.Issue) (types.Issue, error) {
 	issue.Id = s.getNextID()
+	insertStatement, err := s.store.Prepare("INSERT INTO issues(id, title, description, status, user) VALUES(?, ?, ?, ?, ?)")
+	if err != nil {
+		return types.Issue{}, err
+	}
+	_, err = insertStatement.Exec(issue.Id, issue.Title, issue.Description, issue.Status, issue.User)
+	if err != nil {
+		return types.Issue{}, err
+	}
 
+	return issue, nil
+}
+func (s *Storage) GetIssuesByText(str string) ([]types.Issue, error) {
+	issues := []types.Issue{}
+	getStatement, err := s.store.Prepare(`SELECT id, title, description status, user FROM issues WHERE(title LIKE ? OR description LIKE ?)`)
+	if err != nil {
+		return []types.Issue{}, err
+	}
+
+	rows, err := getStatement.Query(str, str)
+	if err != nil {
+		return []types.Issue{}, err
+	}
+
+	for rows.Next() {
+		issue := new(types.Issue)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		if err != nil {
+			return issues, err
+		}
+		issues = append(issues, *issue)
+		return issues, nil
+	}
+	return issues, errors.New("No issue found")
+}
+
+func (s *Storage) GetIssueByStatus(status string) ([]types.Issue, error) {
+	issues := []types.Issue{}
+	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE status LIKE ?")
+	if err != nil {
+		return issues, err
+	}
+
+	rows, err := getStatement.Query(status)
+	if err != nil {
+		return issues, err
+	}
+
+	for rows.Next() {
+		issue := new(types.Issue)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		if err != nil {
+			return issues, err
+		}
+		issues = append(issues, *issue)
+		return issues, nil
+	}
+	return issues, errors.New("No issues found with that status")
+}
+
+func (s *Storage) GetIssueByUser(user string) ([]types.Issue, error) {
+	issues := []types.Issue{}
+	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE user = `?`")
+	if err != nil {
+		return issues, err
+	}
+
+	rows, err := getStatement.Query(user)
+	if err != nil {
+		return issues, err
+	}
+
+	for rows.Next() {
+		issue := new(types.Issue)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		if err != nil {
+			return issues, err
+		}
+		issues = append(issues, *issue)
+		return issues, nil
+	}
+	return issues, errors.New("No issues found for that user")
+}
+
+func (s *Storage) GetIssue(id int) (types.Issue, error) {
+	issue := new(types.Issue)
+
+	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE id = ?")
+	if err != nil {
+		return types.Issue{}, nil
+	}
+
+	rows, err := getStatement.Query(id)
+	if err != nil {
+		return types.Issue{}, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		if err != nil {
+			return *issue, err
+		}
+		return *issue, nil
+	}
+	return *issue, nil
+}
+
+func (s Storage) GetIssues() ([]types.Issue, error) {
+	issues := []types.Issue{}
+
+	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues")
+	if err != nil {
+		return issues, err
+	}
+
+	rows, err := getStatement.Query()
+	if err != nil {
+		return issues, err
+	}
+	for rows.Next() {
+		issue := new(types.Issue)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		if err != nil {
+			return issues, err
+		}
+		issues = append(issues, *issue)
+		return issues, nil
+	}
+
+	return issues, errors.New("No issues found")
+}
+
+func (s *Storage) UpdateIssue(issue types.Issue) error {
+	updateStatement, err := s.store.Prepare("UPDATE issues SET title = ?, description = ?, status = ?, user = ? WHERE id = ? ")
+	if err != nil {
+		return err
+	}
+
+	_, err = updateStatement.Exec(issue.Title, issue.Description, issue.Status, issue.User, issue.Id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Storage) DeleteIssue(id int) error {
+	deleteStatement, err := s.store.Prepare("DELETE FROM issues WHERE ID = ?")
+	if err != nil {
+		return err
+	}
+
+	_, err = deleteStatement.Exec(id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *Storage) getNextID() int {

@@ -1,5 +1,9 @@
 package types
 
+import (
+	"fmt"
+)
+
 type Issue struct {
 	Id          int
 	Title       string
@@ -15,3 +19,8 @@ const (
 	INPROGRESS IssueStatus = "INPROGRESS"
 	CLOSED     IssueStatus = "CLOSED"
 )
+
+func (i *Issue) Print() {
+	fmt.Println("ID\tTitle\tDescription\tStatus\tUser")
+	fmt.Println(i.Id, "\t", i.Title, "\t", i.Description, "\t", i.Status, "\t", i.User)
+}
