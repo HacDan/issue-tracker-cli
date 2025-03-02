@@ -32,6 +32,10 @@ to quickly create a Cobra application.`,
 		if cmd.Flags().Changed("description") {
 			updatedIssue.Description, _ = cmd.Flags().GetString("description")
 		}
+		if cmd.Flags().Changed("priority") {
+			sPriority, _ := cmd.Flags().GetString("priority")
+			updatedIssue.Priority = stringToPriority(sPriority)
+		}
 		if cmd.Flags().Changed("status") {
 			updatedStatus, _ := cmd.Flags().GetString("status")
 			updatedIssue.Status = sStatusToStatus(updatedStatus)
@@ -69,4 +73,5 @@ func sStatusToStatus(s string) types.IssueStatus {
 	if strings.ToLower(s) == "closed" {
 		return types.CLOSED
 	}
+	return types.OPEN
 }

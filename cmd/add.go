@@ -24,6 +24,8 @@ to quickly create a Cobra application.`,
 		issue := types.Issue{}
 		issue.Title, _ = cmd.Flags().GetString("title")
 		issue.Description, _ = cmd.Flags().GetString("description")
+		sPriority, _ := cmd.Flags().GetString("priority")
+		issue.Priority = stringToPriority(sPriority)
 		sStatus, _ := cmd.Flags().GetString("status")
 		issue.Status = setStatus(sStatus)
 		issue.User, _ = cmd.Flags().GetString("user")
@@ -62,4 +64,23 @@ func setStatus(s string) types.IssueStatus {
 		return types.INPROGRESS
 	}
 	return types.OPEN
+}
+
+func stringToPriority(s string) types.PriorityLevel {
+	s = strings.ToLower(s)
+
+	if s == "low" {
+		return types.LOW
+	}
+	if s == "medium" {
+		return types.MEDIUM
+	}
+	if s == "high" {
+		return types.HIGH
+	}
+	if s == "critcial" {
+		return types.CRITICAL
+	}
+
+	return types.LOW
 }

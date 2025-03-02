@@ -29,7 +29,7 @@ func NewStorage() Storage {
 }
 
 func CreateDB(db *sql.DB) {
-	createIssueTableStatement, err := db.Prepare("CREATE TABLE IF NOT EXISTS issues(id INTEGER, title TEXT, description TEXT, status INTEGER, user TEXT);")
+	createIssueTableStatement, err := db.Prepare("CREATE TABLE IF NOT EXISTS issues(id INTEGER, title TEXT, description TEXT, priority INT, status INTEGER, user TEXT);")
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -41,11 +41,11 @@ func CreateDB(db *sql.DB) {
 
 func (s *Storage) AddIssue(issue types.Issue) (types.Issue, error) {
 	issue.Id = s.getNextID()
-	insertStatement, err := s.store.Prepare("INSERT INTO issues(id, title, description, status, user) VALUES(?, ?, ?, ?, ?)")
+	insertStatement, err := s.store.Prepare("INSERT INTO issues(id, title, description, priority, status, user) VALUES(?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		return types.Issue{}, err
 	}
-	_, err = insertStatement.Exec(issue.Id, issue.Title, issue.Description, issue.Status, issue.User)
+	_, err = insertStatement.Exec(issue.Id, issue.Title, issue.Description, issue.Priority, issue.Status, issue.User)
 	if err != nil {
 		return types.Issue{}, err
 	}
@@ -56,7 +56,7 @@ func (s *Storage) AddIssue(issue types.Issue) (types.Issue, error) {
 func (s *Storage) SearchIssuesByText(str string) ([]types.Issue, error) {
 	issues := []types.Issue{}
 	str = "%" + str + "%"
-	getStatement, err := s.store.Prepare(`SELECT id, title, description, status, user FROM issues WHERE(title LIKE ? OR description LIKE ?)`)
+	getStatement, err := s.store.Prepare(`SELECT id, title, description, priority, status, user FROM issues WHERE(title LIKE ? OR description LIKE ?)`)
 	if err != nil {
 		return []types.Issue{}, err
 	}
@@ -68,7 +68,7 @@ func (s *Storage) SearchIssuesByText(str string) ([]types.Issue, error) {
 
 	for rows.Next() {
 		issue := new(types.Issue)
-		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Priority, &issue.Status, &issue.User)
 		if err != nil {
 			return issues, err
 		}
@@ -80,7 +80,7 @@ func (s *Storage) SearchIssuesByText(str string) ([]types.Issue, error) {
 func (s *Storage) SearchIssuesByTitle(str string) ([]types.Issue, error) {
 	str = "%" + str + "%"
 	issues := []types.Issue{}
-	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE title LIKE ?")
+	getStatement, err := s.store.Prepare("SELECT id, title, description, priority, status, user FROM issues WHERE title LIKE ?")
 	if err != nil {
 		return []types.Issue{}, err
 	}
@@ -92,7 +92,7 @@ func (s *Storage) SearchIssuesByTitle(str string) ([]types.Issue, error) {
 
 	for rows.Next() {
 		issue := new(types.Issue)
-		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Priority, &issue.Status, &issue.User)
 		if err != nil {
 			return issues, err
 		}
@@ -104,7 +104,7 @@ func (s *Storage) SearchIssuesByTitle(str string) ([]types.Issue, error) {
 func (s *Storage) SearchIssuesByDescription(str string) ([]types.Issue, error) {
 	str = "%" + str + "%"
 	issues := []types.Issue{}
-	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE(description LIKE ?)")
+	getStatement, err := s.store.Prepare("SELECT id, title, description, priority, status, user FROM issues WHERE(description LIKE ?)")
 	if err != nil {
 		return []types.Issue{}, err
 	}
@@ -116,7 +116,7 @@ func (s *Storage) SearchIssuesByDescription(str string) ([]types.Issue, error) {
 
 	for rows.Next() {
 		issue := new(types.Issue)
-		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Priority, &issue.Status, &issue.User)
 		if err != nil {
 			return issues, err
 		}
@@ -124,9 +124,34 @@ func (s *Storage) SearchIssuesByDescription(str string) ([]types.Issue, error) {
 	}
 	return issues, nil
 }
+
+func (s *Storage) GetIssueByPriority(str string) ([]types.Issue, error) {
+	str = "%" + str + "%"
+	issues := []types.Issue{}
+	getStatement, err := s.store.Prepare("SELECT id, title, description, priority, status, user FROM issues WHERE(priority LIKE ?)")
+	if err != nil {
+		return []types.Issue{}, err
+	}
+
+	rows, err := getStatement.Query(str)
+	if err != nil {
+		return []types.Issue{}, err
+	}
+
+	for rows.Next() {
+		issue := new(types.Issue)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Priority, &issue.Status, &issue.User)
+		if err != nil {
+			return issues, err
+		}
+		issues = append(issues, *issue)
+	}
+	return issues, nil
+}
+
 func (s *Storage) GetIssueByStatus(status string) ([]types.Issue, error) {
 	issues := []types.Issue{}
-	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE status LIKE ?")
+	getStatement, err := s.store.Prepare("SELECT id, title, description, priority, status, user FROM issues WHERE status LIKE ?")
 	if err != nil {
 		return issues, err
 	}
@@ -138,7 +163,7 @@ func (s *Storage) GetIssueByStatus(status string) ([]types.Issue, error) {
 
 	for rows.Next() {
 		issue := new(types.Issue)
-		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Priority, &issue.Status, &issue.User)
 		if err != nil {
 			return issues, err
 		}
@@ -149,7 +174,7 @@ func (s *Storage) GetIssueByStatus(status string) ([]types.Issue, error) {
 
 func (s *Storage) GetIssueByUser(user string) ([]types.Issue, error) {
 	issues := []types.Issue{}
-	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE user LIKE ?")
+	getStatement, err := s.store.Prepare("SELECT id, title, description, priority, status, user FROM issues WHERE user LIKE ?")
 	if err != nil {
 		return issues, err
 	}
@@ -161,7 +186,7 @@ func (s *Storage) GetIssueByUser(user string) ([]types.Issue, error) {
 
 	for rows.Next() {
 		issue := new(types.Issue)
-		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Priority, &issue.Status, &issue.User)
 		if err != nil {
 			return issues, err
 		}
@@ -173,7 +198,7 @@ func (s *Storage) GetIssueByUser(user string) ([]types.Issue, error) {
 func (s *Storage) GetIssue(id int) (types.Issue, error) {
 	issue := new(types.Issue)
 
-	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE id = ?")
+	getStatement, err := s.store.Prepare("SELECT id, title, description, priority, status, user FROM issues WHERE id = ?")
 	if err != nil {
 		return types.Issue{}, nil
 	}
@@ -184,7 +209,7 @@ func (s *Storage) GetIssue(id int) (types.Issue, error) {
 	}
 
 	if rows.Next() {
-		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Priority, &issue.Status, &issue.User)
 		if err != nil {
 			return *issue, err
 		}
@@ -196,7 +221,7 @@ func (s *Storage) GetIssue(id int) (types.Issue, error) {
 func (s *Storage) GetIssues() ([]types.Issue, error) {
 	issues := []types.Issue{}
 
-	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues")
+	getStatement, err := s.store.Prepare("SELECT id, title, description, priority, status, user FROM issues")
 	if err != nil {
 		return issues, err
 	}
@@ -207,7 +232,7 @@ func (s *Storage) GetIssues() ([]types.Issue, error) {
 	}
 	for rows.Next() {
 		issue := new(types.Issue)
-		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Priority, &issue.Status, &issue.User)
 		if err != nil {
 			return issues, err
 		}
@@ -218,12 +243,12 @@ func (s *Storage) GetIssues() ([]types.Issue, error) {
 }
 
 func (s *Storage) UpdateIssue(issue types.Issue) error {
-	updateStatement, err := s.store.Prepare("UPDATE issues SET title = ?, description = ?, status = ?, user = ? WHERE id LIKE ? ")
+	updateStatement, err := s.store.Prepare("UPDATE issues SET title = ?, description = ?, priority = ?, status = ?, user = ? WHERE id LIKE ? ")
 	if err != nil {
 		return err
 	}
 
-	_, err = updateStatement.Exec(issue.Title, issue.Description, issue.Status, issue.User, issue.Id)
+	_, err = updateStatement.Exec(issue.Title, issue.Description, issue.Priority, issue.Status, issue.User, issue.Id)
 	if err != nil {
 		return err
 	}

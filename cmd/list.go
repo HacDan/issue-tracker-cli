@@ -46,7 +46,17 @@ to quickly create a Cobra application.`,
 			}
 			return
 		} else if cmd.Flags().Changed("priority") {
-			fmt.Println("Priority: ", priority)
+			store := storage.NewStorage()
+
+			issues, err := store.GetIssueByPriority(priority)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			for _, issue := range issues {
+				issue.Print()
+			}
+
 			return
 		} else {
 			store := storage.NewStorage()
