@@ -52,9 +52,11 @@ func (s *Storage) AddIssue(issue types.Issue) (types.Issue, error) {
 
 	return issue, nil
 }
-func (s *Storage) GetIssuesByText(str string) ([]types.Issue, error) {
+
+func (s *Storage) SearchIssuesByText(str string) ([]types.Issue, error) {
 	issues := []types.Issue{}
-	getStatement, err := s.store.Prepare(`SELECT id, title, description status, user FROM issues WHERE(title LIKE ? OR description LIKE ?)`)
+	str = "%" + str + "%"
+	getStatement, err := s.store.Prepare(`SELECT id, title, description, status, user FROM issues WHERE(title LIKE ? OR description LIKE ?)`)
 	if err != nil {
 		return []types.Issue{}, err
 	}
@@ -71,11 +73,57 @@ func (s *Storage) GetIssuesByText(str string) ([]types.Issue, error) {
 			return issues, err
 		}
 		issues = append(issues, *issue)
-		return issues, nil
 	}
-	return issues, errors.New("No issue found")
+	return issues, nil
 }
 
+func (s *Storage) SearchIssuesByTitle(str string) ([]types.Issue, error) {
+	str = "%" + str + "%"
+	issues := []types.Issue{}
+	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE title LIKE ?")
+	if err != nil {
+		return []types.Issue{}, err
+	}
+
+	rows, err := getStatement.Query(str)
+	if err != nil {
+		return []types.Issue{}, err
+	}
+
+	for rows.Next() {
+		issue := new(types.Issue)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		if err != nil {
+			return issues, err
+		}
+		issues = append(issues, *issue)
+	}
+	return issues, nil
+}
+
+func (s *Storage) SearchIssuesByDescription(str string) ([]types.Issue, error) {
+	str = "%" + str + "%"
+	issues := []types.Issue{}
+	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE(description LIKE ?)")
+	if err != nil {
+		return []types.Issue{}, err
+	}
+
+	rows, err := getStatement.Query(str)
+	if err != nil {
+		return []types.Issue{}, err
+	}
+
+	for rows.Next() {
+		issue := new(types.Issue)
+		err = rows.Scan(&issue.Id, &issue.Title, &issue.Description, &issue.Status, &issue.User)
+		if err != nil {
+			return issues, err
+		}
+		issues = append(issues, *issue)
+	}
+	return issues, nil
+}
 func (s *Storage) GetIssueByStatus(status string) ([]types.Issue, error) {
 	issues := []types.Issue{}
 	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues WHERE status LIKE ?")

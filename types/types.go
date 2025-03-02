@@ -21,6 +21,5 @@ const (
 )
 
 func (i *Issue) Print() {
-	fmt.Println("ID\tTitle\tDescription\tStatus\tUser")
 	fmt.Println(i.Id, "\t", i.Title, "\t", i.Description, "\t", i.Status, "\t", i.User)
 }

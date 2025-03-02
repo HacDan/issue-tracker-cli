@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/hacdan/issue-tracker-cli/storage"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +21,43 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("search called")
+		title, _ := cmd.Flags().GetString("title")
+		description, _ := cmd.Flags().GetString("description")
+
+		fmt.Println(title, description)
+		if len(args) > 0 {
+			storage := storage.NewStorage()
+			issues, err := storage.SearchIssuesByText(args[0])
+			if err != nil {
+				fmt.Println(err)
+			}
+			for _, issue := range issues {
+				issue.Print()
+			}
+		}
+		if cmd.Flags().Changed("title") {
+			storage := storage.NewStorage()
+			issues, err := storage.SearchIssuesByTitle(title)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			for _, issue := range issues {
+				issue.Print()
+			}
+			return
+		}
+		if cmd.Flags().Changed("description") {
+			storage := storage.NewStorage()
+			issues, err := storage.SearchIssuesByDescription(description)
+			if err != nil {
+				fmt.Println(err)
+			}
+			for _, issue := range issues {
+				issue.Print()
+			}
+			return
+		}
 	},
 }
 
