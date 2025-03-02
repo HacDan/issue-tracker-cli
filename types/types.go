@@ -5,12 +5,12 @@ import (
 )
 
 type Issue struct {
-	Id          int
-	Title       string
-	Description string
-	Priority    PriorityLevel
-	Status      IssueStatus
-	User        string //TODO: Change to user struct later on
+	Id          int           `json:"id"`
+	Title       string        `json:"title"`
+	Description string        `json:"description"`
+	Priority    PriorityLevel `json:"priority"`
+	Status      IssueStatus   `json:"status"`
+	User        string        `json:"user"` //TODO: Change to user struct later on
 }
 
 type IssueStatus string
@@ -32,4 +32,32 @@ const (
 
 func (i *Issue) Print() {
 	fmt.Println(i.Id, "\t", i.Title, "\t", i.Description, "\t", i.Status, "\t", i.User)
+}
+
+func (i IssueStatus) ToString() string {
+	switch i {
+	case OPEN:
+		return "OPEN"
+	case INPROGRESS:
+		return "INPROGRESS"
+	case CLOSED:
+		return "CLOSED"
+	default:
+		return "OPEN"
+	}
+}
+
+func (p PriorityLevel) ToString() string {
+	switch p {
+	case LOW:
+		return "LOW"
+	case MEDIUM:
+		return "MEDIUM"
+	case HIGH:
+		return "HIGH"
+	case CRITICAL:
+		return "CRITICAL"
+	default:
+		return "LOW"
+	}
 }
