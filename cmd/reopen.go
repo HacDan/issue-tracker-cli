@@ -5,15 +5,14 @@ package cmd
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/hacdan/issue-tracker-cli/storage"
 	"github.com/spf13/cobra"
 )
 
-// deleteCmd represents the delete command
-var deleteCmd = &cobra.Command{
-	Use:   "delete",
+// reopenCmd represents the reopen command
+var reopenCmd = &cobra.Command{
+	Use:   "reopen",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -22,30 +21,24 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete called")
+		fmt.Println("reopen called")
+		issueId := stringToInt(args[0])
 		storage := storage.NewStorage()
-		err := storage.DeleteIssue(stringToInt(args[0]))
-		if err != nil {
-			fmt.Println(err)
-		}
+
+		storage.ReopenIssue(issueId)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(deleteCmd)
+	rootCmd.AddCommand(reopenCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// deleteCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// reopenCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// deleteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
-func stringToInt(s string) int {
-	i, _ := strconv.Atoi(s)
-	return i
+	// reopenCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

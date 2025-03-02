@@ -193,7 +193,7 @@ func (s *Storage) GetIssue(id int) (types.Issue, error) {
 	return *issue, nil
 }
 
-func (s Storage) GetIssues() ([]types.Issue, error) {
+func (s *Storage) GetIssues() ([]types.Issue, error) {
 	issues := []types.Issue{}
 
 	getStatement, err := s.store.Prepare("SELECT id, title, description, status, user FROM issues")
@@ -218,12 +218,38 @@ func (s Storage) GetIssues() ([]types.Issue, error) {
 }
 
 func (s *Storage) UpdateIssue(issue types.Issue) error {
-	updateStatement, err := s.store.Prepare("UPDATE issues SET title = ?, description = ?, status = ?, user = ? WHERE id = ? ")
+	updateStatement, err := s.store.Prepare("UPDATE issues SET title = ?, description = ?, status = ?, user = ? WHERE id LIKE ? ")
 	if err != nil {
 		return err
 	}
 
 	_, err = updateStatement.Exec(issue.Title, issue.Description, issue.Status, issue.User, issue.Id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Storage) CloseIssue(id int) error {
+	updateStatement, err := s.store.Prepare("UPDATE issues SET status = ? WHERE id LIKE ? ")
+	if err != nil {
+		return err
+	}
+
+	_, err = updateStatement.Exec("CLOSED", id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Storage) ReopenIssue(id int) error {
+	updateStatement, err := s.store.Prepare("UPDATE issues SET status = ? WHERE id LIKE ? ")
+	if err != nil {
+		return err
+	}
+
+	_, err = updateStatement.Exec("OPEN", id)
 	if err != nil {
 		return err
 	}
