@@ -1,12 +1,11 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
 	"fmt"
+	"strings"
 
+	"github.com/hacdan/issue-tracker-cli/storage"
+	"github.com/hacdan/issue-tracker-cli/types"
 	"github.com/spf13/cobra"
 )
 
@@ -22,6 +21,27 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("edit called")
+		store := storage.NewStorage()
+		updatedIssue := types.Issue{}
+
+		updatedIssue.Id = stringToInt(args[0])
+
+		if cmd.Flags().Changed("title") {
+			updatedIssue.Title, _ = cmd.Flags().GetString("title")
+		}
+		if cmd.Flags().Changed("description") {
+			updatedIssue.Description, _ = cmd.Flags().GetString("description")
+		}
+		if cmd.Flags().Changed("status") {
+			updatedStatus, _ := cmd.Flags().GetString("status")
+			updatedIssue.Status = sStatusToStatus(updatedStatus)
+		}
+		if cmd.Flags().Changed("user") {
+			updatedIssue.User, _ = cmd.Flags().GetString("user")
+		}
+
+		store.UpdateIssue(updatedIssue)
+
 	},
 }
 
@@ -37,4 +57,16 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// editCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func sStatusToStatus(s string) types.IssueStatus {
+	if strings.ToLower(s) == "open" {
+		return types.OPEN
+	}
+	if strings.ToLower(s) == "inprogress" {
+		return types.INPROGRESS
+	}
+	if strings.ToLower(s) == "closed" {
+		return types.CLOSED
+	}
 }
