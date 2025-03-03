@@ -28,7 +28,7 @@ issue delete --all-closed       # Delete all closed issues  `,
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-	deleteCmd.Flags().StringP("all-closed", "ac", "", "Used to delete all closed issues")
+	deleteCmd.Flags().String("all-closed", "", "Used to delete all closed issues")
 }
 
 // TODO: Refactor into utilities package
