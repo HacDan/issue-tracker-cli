@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -14,16 +11,15 @@ import (
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Deletes a specified issue by Id number",
+	Long: `Deletes a specified issue by Id number. Can also be used for
+deleting all-closed issues. Examples:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+issue delete 42
+issue delete --all-closed       # Delete all closed issues  `,
 	Run: func(cmd *cobra.Command, args []string) {
 		storage := storage.NewStorage()
-		err := storage.DeleteIssue(stringToInt(args[0]))
+		err := storage.DeleteIssue(stringToInt(args[0])) //TODO: Refactor to include new flag
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -32,18 +28,10 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// deleteCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// deleteCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	deleteCmd.Flags().StringP("all-closed", "ac", "", "Used to delete all closed issues")
 }
 
+// TODO: Refactor into utilities package
 func stringToInt(s string) int {
 	i, _ := strconv.Atoi(s)
 	return i

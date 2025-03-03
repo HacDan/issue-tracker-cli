@@ -1,9 +1,8 @@
 # 📌 Project: Terminal-Based Issue Tracker CLI
 ## Tech Stack:
-* Language: Golang (or Node.js)
-* Database: SQLite (local) or PostgreSQL (remote sync)
-* CLI UI Framework: bubbletea (for Golang) or ink (for Node.js)
-* Storage & Sync: File-based storage (YAML/JSON) for offline mode + database sync
+* Language: Golang
+* Database: SQLite 
+* CLI Framework: Cobra
 
 ## 🚀 Key Features:
 
@@ -22,27 +21,6 @@
 * GitHub/Jira integration (fetch issues from repositories)
 * Webhook support for notifications
 * Terminal UI mode for an interactive interface
-
-### 📂 Project Structure (Golang Example)
-```sh
-/issue-tracker-cli
-│── main.go            # CLI entry point
-│── cmd/               # Command handlers (add, list, delete, sync)
-│── internal/
-│   ├── db.go          # Database handling (SQLite/PostgreSQL)
-│   ├── storage.go     # Local file storage (JSON/YAML)
-│   ├── sync.go        # Remote sync logic
-│── ui/                # Terminal UI (if using bubbletea)
-│── config.yaml        # Configuration settings
-│── README.md          # Project documentation
-```
-
-### 🔧 Next Steps:
- * Set up a simple CLI structure using cobra (Golang) or commander.js (Node.js).
- * Implement basic issue CRUD operations (store locally in SQLite or JSON).
- * Add filtering, searching, and tagging features.
- * Build remote sync functionality with PostgreSQL.
- * (Optional) Enhance with a terminal UI or GitHub/Jira integration.
 
 ## 📌 Basic Commands
 ### ✅ Create an Issue
@@ -86,7 +64,7 @@ issue delete 42
 issue delete --all-closed       # Delete all closed issues  
 ```
 
-### 📌 Tagging, Filtering, and Organizing
+~~### 📌 Tagging, Filtering, and Organizing~~ Future plans
 #### 🏷️ Tag an Issue
 ```sh
 issue tag 42 -a "backend" -a "security"
@@ -125,22 +103,3 @@ issue export -f csv > issues.csv
 issue import github --repo "org/project"
 issue import jira --project "DEV"
 ```
-
-### 🔔 Enable Webhook Notifications
-```sh
-issue webhook add "http://myserver.com/webhook"
-issue webhook list
-issue webhook remove 1
-```
-
-### 📌 Bonus
-#### Interactive Mode (if you add a TUI interface):
-```sh
-issue ui
-```
-
-Show issue details in a formatted table:
-```sh
-issue show 42
-```
-

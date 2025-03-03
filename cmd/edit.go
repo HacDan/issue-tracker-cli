@@ -11,13 +11,12 @@ import (
 // editCmd represents the edit command
 var editCmd = &cobra.Command{
 	Use:   "edit",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Edits the specified issue by Id number",
+	Long: `edit is used to modify the specified issue
+identified by Id. This command can be used to edit any field 
+in the issue. Example: 
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+issue edit 42 -t "Fix login error" -p critical -s in-progress`,
 	Run: func(cmd *cobra.Command, args []string) {
 		store := storage.NewStorage()
 		updatedIssue := types.Issue{}
@@ -49,18 +48,9 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(editCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// editCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// editCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
+// TODO: Refactor into utilities package
 func sStatusToStatus(s string) types.IssueStatus {
 	if strings.ToLower(s) == "open" {
 		return types.OPEN

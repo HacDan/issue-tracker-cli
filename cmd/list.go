@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -14,14 +11,14 @@ import (
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "lists all open issues for a project",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Long: `The list command lists all issues, with filtering options
+	You can filter on status, priority, or user. For example:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+issue list 
+issue list -s open               # Show only open issues  
+issue list -p high               # Show high-priority issues  
+issue list -a alice              # Show issues assigned to Alice`,
 	Run: func(cmd *cobra.Command, args []string) {
-
 		status, _ := cmd.Flags().GetString("status")
 		user, _ := cmd.Flags().GetString("user")
 		priority, _ := cmd.Flags().GetString("priority")
@@ -68,14 +65,4 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(listCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// listCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

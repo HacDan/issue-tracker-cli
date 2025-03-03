@@ -12,15 +12,18 @@ import (
 // addCmd represents the add command
 var addCmd = &cobra.Command{
 	Use:   "add",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "adds a new issue to the tracker",
+	Long: `The add command adds a new issue to the traacker. The title, description, and user are required fields.
+the rest will be filled with sane defaults. Examples:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+itc add -t "Example Title" -d "Example Description" -p "low" -s "inprogress" -a "John"
+> Issue added successfully
+itc add -t "Example Title" -d Example Description" -a "Jim"
+> Issue added successfully`,
 	Run: func(cmd *cobra.Command, args []string) {
 		issue := types.Issue{}
+		storage := storage.NewStorage()
+
 		issue.Title, _ = cmd.Flags().GetString("title")
 		issue.Description, _ = cmd.Flags().GetString("description")
 		sPriority, _ := cmd.Flags().GetString("priority")
@@ -29,28 +32,19 @@ to quickly create a Cobra application.`,
 		issue.Status = setStatus(sStatus)
 		issue.User, _ = cmd.Flags().GetString("user")
 
-		storage := storage.NewStorage()
 		_, err := storage.AddIssue(issue)
 		if err != nil {
 			fmt.Println("Error adding issue: ", err)
 		}
+		fmt.Println("Issue added successfully")
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(addCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// addCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// addCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
+// TODO: Refactor into utility package
 func setStatus(s string) types.IssueStatus {
 	s = strings.ToLower(s)
 	if s == "open" {

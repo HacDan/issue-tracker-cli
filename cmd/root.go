@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -11,17 +8,17 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "issue-tracker-cli",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Use:   "itc",
+	Short: "itc is an all inclusive issue tracker for local projects",
+	Long: `itc is an all inclusive local issue tracker. Data is stored in a SQLite Databse
+named: ./.issues.db. itc currently only searches the root directory for this file. 
+If not present, it will be created. Basic usage:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+issue add -t "Fix login bug" -d "Users cannot log in with special characters" -p high -s open -a alice
+issues list -s open
+issue search "login bug"
+issue edit 42 -t "Fix login error" -p critical -s in-progress
+issue delete 42`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -34,15 +31,6 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.issue-tracker-cli.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-
 	var title string
 	rootCmd.PersistentFlags().StringVarP(&title, "title", "t", "", "Title for issue")
 

@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -16,13 +13,13 @@ import (
 // exportCmd represents the export command
 var exportCmd = &cobra.Command{
 	Use:   "export",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Exports all issues in the database",
+	Long: `Takes all issues in the database, 
+converts to the specified structured data format (JSON, CSV)
+(defaults to JSON) and writes to stdout. Examples:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+issue export -f json > issues.json
+issue export -f csv > issues.csv`,
 	Run: func(cmd *cobra.Command, args []string) {
 		store := storage.NewStorage()
 		issues, _ := store.GetIssues()
@@ -42,17 +39,9 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(exportCmd)
 	exportCmd.Flags().StringP("filetype", "f", "json", "Export file type")
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// exportCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// exportCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
+// TODO: Refactor to utilities package
 func issuesToJson(issues []types.Issue) string {
 	sIssues, err := json.Marshal(issues)
 	if err != nil {
