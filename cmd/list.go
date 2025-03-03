@@ -27,7 +27,6 @@ to quickly create a Cobra application.`,
 		priority, _ := cmd.Flags().GetString("priority")
 
 		if cmd.Flags().Changed("status") {
-			fmt.Println("Status called: ", status)
 			store := storage.NewStorage()
 			issues, _ := store.GetIssueByStatus(status)
 			for _, issue := range issues {
@@ -35,7 +34,6 @@ to quickly create a Cobra application.`,
 			}
 			return
 		} else if cmd.Flags().Changed("user") {
-			fmt.Println("User called: ", user)
 			store := storage.NewStorage()
 			issues, err := store.GetIssueByUser(user)
 			if err != nil {
