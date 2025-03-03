@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/hacdan/issue-tracker-cli/storage"
+	"github.com/hacdan/issue-tracker-cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +25,7 @@ issue delete --all-closed       # Delete all closed issues  `,
 			fmt.Println("Successfully deleted all closed issues")
 			return
 		}
-		err := storage.DeleteIssue(stringToInt(args[0]))
+		err := storage.DeleteIssue(utils.StringToInt(args[0]))
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -35,10 +35,4 @@ issue delete --all-closed       # Delete all closed issues  `,
 func init() {
 	rootCmd.AddCommand(deleteCmd)
 	deleteCmd.Flags().Bool("all-closed", false, "Used to delete all closed issues")
-}
-
-// TODO: Refactor into utilities package
-func stringToInt(s string) int {
-	i, _ := strconv.Atoi(s)
-	return i
 }

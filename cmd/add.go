@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/hacdan/issue-tracker-cli/storage"
 	"github.com/hacdan/issue-tracker-cli/types"
+	"github.com/hacdan/issue-tracker-cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -27,9 +27,9 @@ itc add -t "Example Title" -d Example Description" -a "Jim"
 		issue.Title, _ = cmd.Flags().GetString("title")
 		issue.Description, _ = cmd.Flags().GetString("description")
 		sPriority, _ := cmd.Flags().GetString("priority")
-		issue.Priority = stringToPriority(sPriority)
+		issue.Priority = utils.StringToPriority(sPriority)
 		sStatus, _ := cmd.Flags().GetString("status")
-		issue.Status = setStatus(sStatus)
+		issue.Status = utils.SStatusToStatus(sStatus)
 		issue.User, _ = cmd.Flags().GetString("user")
 
 		_, err := storage.AddIssue(issue)
@@ -42,38 +42,4 @@ itc add -t "Example Title" -d Example Description" -a "Jim"
 
 func init() {
 	rootCmd.AddCommand(addCmd)
-}
-
-// TODO: Refactor into utility package
-func setStatus(s string) types.IssueStatus {
-	s = strings.ToLower(s)
-	if s == "open" {
-		return types.OPEN
-	}
-	if s == "closed" {
-		return types.CLOSED
-	}
-	if s == "inprogress" {
-		return types.INPROGRESS
-	}
-	return types.OPEN
-}
-
-func stringToPriority(s string) types.PriorityLevel {
-	s = strings.ToLower(s)
-
-	if s == "low" {
-		return types.LOW
-	}
-	if s == "medium" {
-		return types.MEDIUM
-	}
-	if s == "high" {
-		return types.HIGH
-	}
-	if s == "critcial" {
-		return types.CRITICAL
-	}
-
-	return types.LOW
 }

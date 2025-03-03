@@ -1,10 +1,9 @@
 package cmd
 
 import (
-	"strings"
-
 	"github.com/hacdan/issue-tracker-cli/storage"
 	"github.com/hacdan/issue-tracker-cli/types"
+	"github.com/hacdan/issue-tracker-cli/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +20,7 @@ issue edit 42 -t "Fix login error" -p critical -s in-progress`,
 		store := storage.NewStorage()
 		updatedIssue := types.Issue{}
 
-		updatedIssue.Id = stringToInt(args[0])
+		updatedIssue.Id = utils.StringToInt(args[0])
 
 		if cmd.Flags().Changed("title") {
 			updatedIssue.Title, _ = cmd.Flags().GetString("title")
@@ -31,11 +30,11 @@ issue edit 42 -t "Fix login error" -p critical -s in-progress`,
 		}
 		if cmd.Flags().Changed("priority") {
 			sPriority, _ := cmd.Flags().GetString("priority")
-			updatedIssue.Priority = stringToPriority(sPriority)
+			updatedIssue.Priority = utils.StringToPriority(sPriority)
 		}
 		if cmd.Flags().Changed("status") {
 			updatedStatus, _ := cmd.Flags().GetString("status")
-			updatedIssue.Status = sStatusToStatus(updatedStatus)
+			updatedIssue.Status = utils.SStatusToStatus(updatedStatus)
 		}
 		if cmd.Flags().Changed("user") {
 			updatedIssue.User, _ = cmd.Flags().GetString("user")
@@ -48,18 +47,4 @@ issue edit 42 -t "Fix login error" -p critical -s in-progress`,
 
 func init() {
 	rootCmd.AddCommand(editCmd)
-}
-
-// TODO: Refactor into utilities package
-func sStatusToStatus(s string) types.IssueStatus {
-	if strings.ToLower(s) == "open" {
-		return types.OPEN
-	}
-	if strings.ToLower(s) == "inprogress" {
-		return types.INPROGRESS
-	}
-	if strings.ToLower(s) == "closed" {
-		return types.CLOSED
-	}
-	return types.OPEN
 }
