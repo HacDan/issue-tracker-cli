@@ -22,15 +22,19 @@ issue export -f csv > issues.csv`,
 		store := storage.NewStorage()
 		issues, _ := store.GetIssues()
 
-		fileType, _ := cmd.Flags().GetString("filetype")
-		if cmd.Flags().Changed("filetype") {
-			if fileType == "json" {
-				fmt.Println(utils.IssuesToJson(issues))
-			}
-			if fileType == "csv" {
-				fmt.Println(utils.IssuesToCSV(issues))
-			}
+		fileType, err := cmd.Flags().GetString("filetype")
+		if err != nil {
+			fmt.Println(err)
 		}
+		if fileType == "json" {
+			fmt.Println(utils.IssuesToJson(issues))
+			return
+		}
+		if fileType == "csv" {
+			fmt.Println(utils.IssuesToCSV(issues))
+			return
+		}
+		fmt.Println(utils.IssuesToJson(issues))
 	},
 }
 
