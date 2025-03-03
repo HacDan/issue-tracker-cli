@@ -19,7 +19,13 @@ issue delete 42
 issue delete --all-closed       # Delete all closed issues  `,
 	Run: func(cmd *cobra.Command, args []string) {
 		storage := storage.NewStorage()
-		err := storage.DeleteIssue(stringToInt(args[0])) //TODO: Refactor to include new flag
+		deleteAllClosed, _ := cmd.Flags().GetBool("all-closed")
+		if deleteAllClosed {
+			storage.DeleteAllClosedIssues()
+			fmt.Println("Successfully deleted all closed issues")
+			return
+		}
+		err := storage.DeleteIssue(stringToInt(args[0]))
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -28,7 +34,7 @@ issue delete --all-closed       # Delete all closed issues  `,
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-	deleteCmd.Flags().String("all-closed", "", "Used to delete all closed issues")
+	deleteCmd.Flags().Bool("all-closed", false, "Used to delete all closed issues")
 }
 
 // TODO: Refactor into utilities package

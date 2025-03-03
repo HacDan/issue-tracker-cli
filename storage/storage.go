@@ -293,6 +293,18 @@ func (s *Storage) DeleteIssue(id int) error {
 	}
 	return nil
 }
+func (s *Storage) DeleteAllClosedIssues() error {
+	deleteStatement, err := s.store.Prepare("DELETE FROM issues WHERE status = `closed`")
+	if err != nil {
+		return err
+	}
+
+	_, err = deleteStatement.Exec()
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func (s *Storage) getNextID() int {
 	rows, err := s.store.Query("SELECT id FROM issues;")
